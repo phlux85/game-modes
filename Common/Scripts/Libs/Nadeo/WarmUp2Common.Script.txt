@@ -1,8 +1,8 @@
 /**
  *	WarmUp lib
  */
-#Const	Version		"2014-04-23"
-#Const	ScriptName	"WarmUp2.Script.txt"
+#Const	Version		"2015-02-23"
+#Const	ScriptName	"WarmUp2Common.Script.txt"
 
 #Include "TextLib" as TL
 
@@ -152,15 +152,15 @@ declare CMlQuad Button_PagerNext;
 declare CMlQuad Button_PagerPrevOff;
 declare CMlQuad Button_PagerNextOff;
 
-CSmPlayer FindPlayerFromLogin(Text _Login) {
+/*CSmPlayer FindPlayerFromLogin(Text _Login) {
 	if (_Login == "") return Null;
 	
 	foreach (Player in Players) {
-		if (Player.Login == _Login) return Player;
+		if (Player.User.Login == _Login) return Player;
 	}
 	
 	return Null;
-}
+}*/
 
 Void UpdateSlotsPosition(Integer _ItemsNb) {
 	declare ItemWidth = {{{SlotWidth}}};
@@ -168,13 +168,13 @@ Void UpdateSlotsPosition(Integer _ItemsNb) {
 	declare Width = (_ItemsNb * ItemWidth) + ((_ItemsNb - 1) * ItemMargin);
 	declare X = -((Width - ItemWidth)/ 2.);
 	
-	Button_PagerPrev.PosnX = X-(ItemWidth/2.)-8.;
-	Button_PagerNext.PosnX = -X+(ItemWidth/2.)+8.;
-	Button_PagerPrevOff.PosnX = X-(ItemWidth/2.)-8.;
-	Button_PagerNextOff.PosnX = -X+(ItemWidth/2.)+8.;
+	Button_PagerPrev.RelativePosition.X = X-(ItemWidth/2.)-8.;
+	Button_PagerNext.RelativePosition.X = -X+(ItemWidth/2.)+8.;
+	Button_PagerPrevOff.RelativePosition.X = X-(ItemWidth/2.)-8.;
+	Button_PagerNextOff.RelativePosition.X = -X+(ItemWidth/2.)+8.;
 	
 	foreach (Key => Frame_Slot in Frames_Slot) {
-		Frame_Slot.PosnX = X;
+		Frame_Slot.RelativePosition.X = X;
 		
 		X += ItemWidth + ItemMargin;
 		if (Key <= _ItemsNb) Frame_Slot.Show();
@@ -207,23 +207,23 @@ Void UpdateIcons() {
 		if (Icon != "") {
 			if (!Quad_Icon.Visible) {
 				Quad_Icon.Show();
-				Label_Slot.PosnX = {{{LabelPosX}}};
-				Label_EmptySlot.PosnX = {{{LabelPosX}}};
+				Label_Slot.RelativePosition.X = {{{LabelPosX}}};
+				Label_EmptySlot.RelativePosition.X = {{{LabelPosX}}};
 				Label_Slot.Size.X = {{{LabelWidth}}};
 				Label_EmptySlot.Size.X = {{{LabelWidth}}};
-				Label_Slot.Scale = 0.9;
-				Label_EmptySlot.Scale = 0.9;
+				Label_Slot.RelativeScale = 0.9;
+				Label_EmptySlot.RelativeScale = 0.9;
 			}
 			Quad_Icon.ChangeImageUrl(Icon);
 		} else {
 			if (Quad_Icon.Visible) {
 				Quad_Icon.Hide();
-				Label_Slot.PosnX = 0.;
-				Label_EmptySlot.PosnX = 0.;
+				Label_Slot.RelativePosition.X = 0.;
+				Label_EmptySlot.RelativePosition.X = 0.;
 				Label_Slot.Size.X = {{{SlotWidth}}};
 				Label_EmptySlot.Size.X = {{{SlotWidth}}};
-				Label_Slot.Scale = 1.;
-				Label_EmptySlot.Scale = 1.;
+				Label_Slot.RelativeScale = 1.;
+				Label_EmptySlot.RelativeScale = 1.;
 			}
 		}
 		
@@ -316,9 +316,19 @@ Void UpdateView(Text _GroupName, Integer _PageNum) {
 		
 		if (Net_LibWarmUp2_Groups[_GroupName].existskey(I)) {
 			Login = Net_LibWarmUp2_Groups[_GroupName][I];
-			declare Player <=> FindPlayerFromLogin(Login);
+			//declare Player <=> FindPlayerFromLogin(Login);
+			
+			declare Player <=> InputPlayer;
+			Player = Null;
+			foreach (TmpPlayer in Players) {
+				if (TmpPlayer.User.Login == Login) {
+					Player <=> TmpPlayer;
+					break;
+				}
+			}
+			
 			if (Player != Null) {
-				Label_Slot.SetText(Player.Name);
+				Label_Slot.SetText(Player.User.Name);
 				if (Label_EmptySlot.Visible) Label_EmptySlot.Hide();
 				declare netread Boolean Net_LibWarmUp2_IsReadyServer for Player;
 				ToggleReadyDisplay(Frames_Slot[J], Net_LibWarmUp2_IsReadyServer);
@@ -482,7 +492,7 @@ main() {
 			if (PrevLayerPosition != Net_LibWarmUp2_LayerPosition) {
 				PrevLayerPosition = Net_LibWarmUp2_LayerPosition;
 				
-				Frame_WarmUp.PosnX = PrevLayerPosition.X;
+				Frame_WarmUp.RelativePosition.X = PrevLayerPosition.X;
 				Frame_WarmUp.PosnY = PrevLayerPosition.Y;
 			}
 			
@@ -804,9 +814,9 @@ Boolean Updated() {
  *
  *	@return		True if the player is ready, false otherwise
  */
-Boolean IsReady(CSmPlayer _Player) {
+Boolean IsReady(CPlayer _Player) {
 	if (_Player == Null) return False;
-	if (_Player.IsFakePlayer) return True;
+	if (_Player.User.IsFakeUser) return True;
 	
 	declare UI <=> UIManager.GetUI(_Player);
 	if (UI == Null) return True;
@@ -839,7 +849,7 @@ Boolean IsReady(Ident _PlayerId) {
  *	@param	_Player		The player to remove
  *	@param	_GroupName	The group where to move the player
  */
-Void SetPlayerGroup(CSmPlayer _Player, Text _GroupName) {
+Void SetPlayerGroup(CPlayer _Player, Text _GroupName) {
 	if (_Player == Null) return;
 	if (!G_LibWarmUp2_GroupsIds.existskey(_GroupName)) return;
 	
@@ -875,7 +885,7 @@ Void SetPlayerGroup(CSmPlayer _Player, Text _GroupName) {
  *
  *	@param	The player to remove
  */
-Void UnsetPlayerGroup(CSmPlayer _Player) {
+Void UnsetPlayerGroup(CPlayer _Player) {
 	declare Text LibWarmUp2_CurrentGroup for _Player;
 	
 	// Remove the player from his old group
@@ -908,7 +918,7 @@ Void UnsetPlayerGroup(CSmPlayer _Player) {
  *
  *	@return		The name of the group if the player has one, an empty Text otherwise
  */
-Text GetPlayerGroup(CSmPlayer _Player) {
+Text GetPlayerGroup(CPlayer _Player) {
 	declare Text LibWarmUp2_CurrentGroup for _Player;
 	return LibWarmUp2_CurrentGroup;
 }
@@ -924,7 +934,7 @@ Text GetPlayerGroup(CSmPlayer _Player) {
  *	@param	_Slot		The slot for this player
  *	@param	_Forced		If False, the slot must meet certain conditions before the player can take it
  */
-Void SetPlayerSlot(CSmPlayer _Player, Integer _Slot, Boolean _Forced) {
+Void SetPlayerSlot(CPlayer _Player, Integer _Slot, Boolean _Forced) {
 	if (_Player == Null) return;
 	declare Text LibWarmUp2_CurrentGroup for _Player;
 	if (!G_LibWarmUp2_GroupsIds.existskey(LibWarmUp2_CurrentGroup)) return;
@@ -962,7 +972,7 @@ Void SetPlayerSlot(CSmPlayer _Player, Integer _Slot, Boolean _Forced) {
 
 // ---------------------------------- //
 // Overload of the SetPlayerSlot function
-Void SetPlayerSlot(CSmPlayer _Player, Integer _Slot) {
+Void SetPlayerSlot(CPlayer _Player, Integer _Slot) {
 	SetPlayerSlot(_Player, _Slot, False);
 }
 
@@ -973,7 +983,7 @@ Void SetPlayerSlot(CSmPlayer _Player, Integer _Slot) {
  *
  *	@return		The slot of the player if he has one, -1 otherwise
  */
-Integer GetPlayerSlot(CSmPlayer _Player) {
+Integer GetPlayerSlot(CPlayer _Player) {
 	if (_Player == Null) return -1;
 	declare Text LibWarmUp2_CurrentGroup for _Player;
 	if (!G_LibWarmUp2_GroupsIds.existskey(LibWarmUp2_CurrentGroup)) return -1;
@@ -987,7 +997,7 @@ Integer GetPlayerSlot(CSmPlayer _Player) {
  *
  *	@param	_Player		The player to unset
  */
-Void UnsetPlayerSlot(CSmPlayer _Player) {
+Void UnsetPlayerSlot(CPlayer _Player) {
 	if (_Player == Null) return;
 	declare Text LibWarmUp2_CurrentGroup for _Player;
 	if (!G_LibWarmUp2_GroupsIds.existskey(LibWarmUp2_CurrentGroup)) return;
@@ -1307,9 +1317,6 @@ Void Begin() {
 	G_LibWarmUp2_SavedTimer.clear();
 	G_LibWarmUp2_Updated = True;
 	G_LibWarmUp2_Stop = False;
-	
-	StartTime = Now + 1000;
-	EndTime = -1;
 }
 
 // ---------------------------------- //
@@ -1317,14 +1324,17 @@ Void Begin() {
 Void End() {	
 	Detach();
 	G_LibWarmUp2_Stop = False;
-	
-	StartTime = -1;
-	EndTime = -1;
 }
 
 // ---------------------------------- //
-/// Warm up loop
-Void Loop() {
+/** Warm up loop
+ *	@param	_EndTime	The current end time
+ *
+ *	@return 			The new end time
+ */
+Integer Loop(Integer _EndTime) {
+	declare CommonEndTime = _EndTime;
+	
 	// Check the players requests
 	foreach (Player in Players) {
 		declare Text LibWarmUp2_CurrentGroup for Player;
@@ -1348,10 +1358,10 @@ Void Loop() {
 		
 		declare netwrite Net_LibWarmUp2_IsReadyServer for Player = False;
 		declare netread Boolean Net_LibWarmUp2_IsReadyClient for UI;
-		if (Player.IsFakePlayer && !Net_LibWarmUp2_IsReadyServer) {
+		if (Player.User.IsFakeUser && !Net_LibWarmUp2_IsReadyServer) {
 			Net_LibWarmUp2_IsReadyServer = True;
 			G_LibWarmUp2_Updated = True;
-		} else if (!Player.IsFakePlayer && Net_LibWarmUp2_IsReadyServer != Net_LibWarmUp2_IsReadyClient) {
+		} else if (!Player.User.IsFakeUser && Net_LibWarmUp2_IsReadyServer != Net_LibWarmUp2_IsReadyClient) {
 			Net_LibWarmUp2_IsReadyServer = Net_LibWarmUp2_IsReadyClient;
 			G_LibWarmUp2_Updated = True;
 		}
@@ -1399,7 +1409,7 @@ Void Loop() {
 			declare OverrideEndTime = -1;
 			if (NewTimer > 0 && NewTimer < G_LibWarmUp2_CurrentTimer) {
 				G_LibWarmUp2_SavedTimer.clear();
-				G_LibWarmUp2_SavedTimer[G_LibWarmUp2_CurrentTimer] = EndTime;
+				G_LibWarmUp2_SavedTimer[G_LibWarmUp2_CurrentTimer] = CommonEndTime;
 			} else if (G_LibWarmUp2_SavedTimer.existskey(NewTimer)) {
 				OverrideEndTime = G_LibWarmUp2_SavedTimer[NewTimer];
 				G_LibWarmUp2_SavedTimer.clear();
@@ -1408,20 +1418,20 @@ Void Loop() {
 			}
 			G_LibWarmUp2_CurrentTimer = NewTimer;
 			
-			if (OverrideEndTime >= 0) EndTime = OverrideEndTime;
-			else if (G_LibWarmUp2_CurrentTimer >= 0) EndTime = Now + G_LibWarmUp2_CurrentTimer;
-			else EndTime = -1;
+			if (OverrideEndTime >= 0) CommonEndTime = OverrideEndTime;
+			else if (G_LibWarmUp2_CurrentTimer >= 0) CommonEndTime = Now + G_LibWarmUp2_CurrentTimer;
+			else CommonEndTime = -1;
 		}
 	}
 	
-	if (EndTime > 0 && EndTime <= Now) G_LibWarmUp2_Stop = True;
+	if (CommonEndTime > 0 && CommonEndTime <= Now) G_LibWarmUp2_Stop = True;
 	
 	// XmlRpc commands
 	foreach (Event in XmlRpc.PendingEvents) {
 		if (Event.Param1 == "WarmUp_Extend") {
 			declare ExtendTime = TL::ToInteger(Event.Param2);
-			if (EndTime >= 0) {
-				EndTime += ExtendTime;
+			if (CommonEndTime >= 0) {
+				CommonEndTime += ExtendTime;
 				if (G_LibWarmUp2_SavedTimer.count > 0) {
 					declare Key = -1;
 					foreach (Timer => PrevEndTime in G_LibWarmUp2_SavedTimer) { Key = Timer; break; }
@@ -1435,35 +1445,8 @@ Void Loop() {
 		
 	// Cleaning
 	Clean();
-}
-
-// ---------------------------------- //
-/// Default events management
-Void ManageEvents() {
-	foreach (Event in PendingEvents) {
-		if (Event.Type == CSmModeEvent::EType::OnHit) {
-			if (Event.Shooter != Null && Event.Victim != Null && Event.Victim == Event.Shooter) {
-				Discard(Event);
-			} else if (Event.Victim != Null) {
-				Event.Victim.Armor = Event.Victim.ArmorMax;
-				Event.Damage = 100;
-				PassOn(Event);
-			} else {
-				PassOn(Event);
-			}
-		} else if (Event.Type == CSmModeEvent::EType::OnArmorEmpty) {
-			if (Event.Shooter != Null && Event.Victim != Null) {
-				Event.Victim.Armor = Event.Victim.ArmorMax;
-				Discard(Event);
-			} else {
-				PassOn(Event);
-			}
-		} else if (Event.Type == CSmModeEvent::EType::OnPlayerTouchesObject) {
-			Discard(Event);
-		} else {
-			PassOn(Event);
-		}
-	}
+	
+	return CommonEndTime;
 }
 
 // ---------------------------------- //

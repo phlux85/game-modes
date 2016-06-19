@@ -1,7 +1,7 @@
 /**
  * Interface library
  */
-#Const Version		"2014-04-29"
+#Const Version		"2014-10-14"
 #Const ScriptName	"Interface.Script.txt"
 
 // ---------------------------------- //
@@ -89,19 +89,23 @@ Text GetScriptName() {
 
 // ---------------------------------- //
 Void SetLayerTeams(CUILayer _LayerTeams) {
-	_LayerTeams.ManialinkPage = 
-	C_TeamNamesManialink^"""
-<playerlist posn="-160 66" halign="left"  style="" substyle="Small" lines="10" columns="1" team="1" status="Playing"/>
-<playerlist posn=" 160 66" halign="right" style="" substyle="Small" lines="10" columns="1" team="2" status="Playing"/>
+	_LayerTeams.ManialinkPage = """
+<manialink version="1" name="Lib_Interface:PlayersLists_Players">
+		{{{C_TeamNamesManialink}}}
+	<playerlist posn="-160 66" halign="left"  style="" substyle="Small" lines="10" columns="1" team="1" status="Playing"/>
+	<playerlist posn=" 160 66" halign="right" style="" substyle="Small" lines="10" columns="1" team="2" status="Playing"/>
+</manialink>
 """;
 }
 
 // ---------------------------------- //
 Void SetLayerTeamsForSpectators(CUILayer _LayerTeams) {
-	_LayerTeams.ManialinkPage = 
-	C_TeamNamesManialink^"""
-<playerlist posn="-160 66" halign="left"  style="" substyle="Medium" lines="5" columns="1" team="1" status="Playing"/>
-<playerlist posn=" 160 66" halign="right" style="" substyle="Medium" lines="5" columns="1" team="2" status="Playing"/>
+	_LayerTeams.ManialinkPage = """
+<manialink version="1" name="Lib_Interface:PlayersLists_Spectators">
+		{{{C_TeamNamesManialink}}}
+	<playerlist posn="-160 66" halign="left"  style="" substyle="Medium" lines="5" columns="1" team="1" status="Playing"/>
+	<playerlist posn=" 160 66" halign="right" style="" substyle="Medium" lines="5" columns="1" team="2" status="Playing"/>
+</manialink>
 """;
 }
 
@@ -123,6 +127,7 @@ Text Private_CreateLayerPlayersLists(Text _Style, Real _Scale, Integer _Lines, I
 	}
 	
 return """
+<manialink version="1" name="Lib_Interface:PlayersLists">
 <frame id="Frame_PlayersLists">
 	<frame posn="-160 68">
 		<frame hidden="{{{HeadersHidden}}}">
@@ -207,6 +212,7 @@ main() {
 	}
 }
 --></script>
+</manialink>
 """;
 }
 
@@ -289,6 +295,7 @@ Void SetPlayersListsVisibility(Integer _Visibility) {
  */
 Void SetLayerPosition(CUILayer _LayerPosition) {
 	_LayerPosition.ManialinkPage = """
+<manialink version="1" name="Lib_Interface:Position">
 <script><!--
 	main() {
 		declare Label_PosTotal <=> (Page.GetFirstChild("PosTotal") as CMlLabel);
@@ -341,7 +348,7 @@ Void SetLayerPosition(CUILayer _LayerPosition) {
 	<label posn="0 1" halign="left" valign="bottom" id="PosTotal" />
 	<label posn="0 0" halign="right" valign="bottom" style="TextRaceChrono" id="PosCurrent" />
 </frame>
-""";
+</manialink>""";
 }
 
 // ---------------------------------- //
@@ -407,6 +414,7 @@ Void UpdatePosition(CPlayer _Player) {
  */
 Text Private_CreateLayerRank() {
 	return """
+<manialink version="1" name="Lib_Interface:Rank">
 <frame posn="150 -88">
 	<label posn="0 1" halign="left" valign="bottom" style="TextRaceMessage" id="Label_PosTotal" />
 	<label posn="0 0" halign="right" valign="bottom" style="TextRaceChrono" id="Label_PosCurrent" />
@@ -467,6 +475,7 @@ main() {
 	}
 }
 --></script>
+</manialink>
 """;
 }
 
@@ -591,7 +600,7 @@ Text Private_CreateSliderScript() {
 #Const C_SlideType_Top	{{{C_LibUI_SlideType_Top}}}
 #Const C_SlideType_Text	{{{C_LibUI_SlideType_Text}}}
 #Const C_SlideType_Img	{{{C_LibUI_SlideType_Img}}}
-#Const C_AnimDuration	1000
+#Const C_AnimDuration	250
 
 declare CMlFrame[Integer] G_Slides;
 //declare CBuddy Buddy for UI;
@@ -657,6 +666,10 @@ Real EaseInOutBack(Integer _Time, Real _StartPos, Real _EndPos, Integer _Duratio
 	declare Distance = (_EndPos - _StartPos) / 2.;
 	declare Progression = (_Time * 1.) / (_Duration / 2.);
 	declare Damping = _Damping * 1.525;
+	
+	// EaseOutQuad;
+	declare X = _Time / (_Duration*1.);
+	return -(_EndPos - _StartPos) * X * (X-2.) + _StartPos;
 	
 	// In
 	if (Progression < 1.) {
@@ -894,7 +907,7 @@ main() {
 			PrevTopUpdate = LibUI_TopUpdate;
 			
 			foreach (SlideId => SlideType in Net_LibUI_SlideType){
-				if (SlideType == C_SlideType_Top) UpdateSlideTop(SlideId, PrevTitle[SlideId], PrevContent[SlideId]);
+				if (SlideType == C_SlideType_Top && PrevTitle.existskey(SlideId) && PrevContent.existskey(SlideId)) UpdateSlideTop(SlideId, PrevTitle[SlideId], PrevContent[SlideId]);
 			}
 		}
 		
@@ -952,6 +965,8 @@ Void Private_UpdateSliderML() {
 
 	
 	declare ML = "";
+	ML ^= """<manialink version="1" name="Lib_Interface:Slider">""";
+	
 	ML ^= """<frame posn="-70 86" id="Frame_SliderGlobal">""";
 		
 	ML ^= """	<frame posn="0 0" id="Frame_Slider">""";
@@ -971,7 +986,8 @@ Void Private_UpdateSliderML() {
 					<quad posn="-5.70 6 -1" sizen="60 60" image="{{{C_LibUI_ImgTopsBg2}}}" />
 					<quad posn="47.30 -20 0" sizen="3.93 5.83 0" image="{{{C_LibUI_ImgButtonMinimizeHide}}}" id="Quad_MinimizeTop" scriptevents="1"/>
 			 	</frame>
-			</frame>""";
+			</frame>
+		</manialink>""";
 			
 
 
@@ -1102,10 +1118,10 @@ Void AddSlide(Integer _Id, Text _Type, Text _Title, Text _Content) {
 	declare netwrite Integer[Integer] Net_LibUI_SlideType for Teams[0];
 	declare netwrite Text[Integer] Net_LibUI_SlideTitle for Teams[0];
 	declare netwrite Text[Integer] Net_LibUI_SlideContent for Teams[0];
-	Net_LibUI_SlideUpdate	= Now;
 	Net_LibUI_SlideType		= G_LibUI_SlideType;
 	Net_LibUI_SlideTitle	= G_LibUI_SlideTitle;
 	Net_LibUI_SlideContent	= G_LibUI_SlideContent;
+	Net_LibUI_SlideUpdate	= Now;
 }
 
 // ---------------------------------- //
@@ -1119,6 +1135,16 @@ Void RemoveSlide(Integer _Id) {
 	declare Removed = G_LibUI_SlideType.removekey(_Id);
 	Removed = G_LibUI_SlideTitle.removekey(_Id);
 	Removed = G_LibUI_SlideContent.removekey(_Id);
+	
+	declare netwrite Integer Net_LibUI_SlideUpdate for Teams[0];
+	declare netwrite Integer[Integer] Net_LibUI_SlideType for Teams[0];
+	declare netwrite Text[Integer] Net_LibUI_SlideTitle for Teams[0];
+	declare netwrite Text[Integer] Net_LibUI_SlideContent for Teams[0];
+	Net_LibUI_SlideType		= G_LibUI_SlideType;
+	Net_LibUI_SlideTitle	= G_LibUI_SlideTitle;
+	Net_LibUI_SlideContent	= G_LibUI_SlideContent;
+	Net_LibUI_SlideUpdate	= Now;
+	
 	Private_UpdateSliderML();
 }
 

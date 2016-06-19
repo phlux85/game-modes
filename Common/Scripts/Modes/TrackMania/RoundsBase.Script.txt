@@ -2,12 +2,10 @@
  *	Rounds base mode
  */
 
-#Extends "Modes/TrackMania/ModeBase.Script.txt"
+#Extends "Modes/TrackMania/ModeMatchmaking.Script.txt"
 
-#Const	RoundsBaseVersion		"2014-04-29"
+#Const	RoundsBaseVersion		"2014-12-31"
 #Const	RoundsBaseScriptName	"RoundsBase.Script.txt"
-
-#Include "Libs/Nadeo/TrackMania/UI.Script.txt" as UI
 
 // ---------------------------------- //
 // Settings
@@ -16,17 +14,12 @@
 #Setting S_FinishTimeout		-1		as _("Finish timeout :")
 #Setting S_UseAlternateRules	False	as _("Use alternate rules :")
 #Setting S_ForceLapsNb			-1		as _("Force number of laps :")
-
-// ---------------------------------- //
-// Constants
-// ---------------------------------- //
-#Const C_PointsRepartition [10, 6, 4, 3, 2, 1]
+#Setting S_DisplayTimeDiff		False	as _("Display time difference at checkpoint :")
 
 // ---------------------------------- //
 // Globales
 // ---------------------------------- //
 declare Integer G_RoundStartTime;
-declare Integer[] G_PointsRepartition;
 
 // ---------------------------------- //
 // Extend
@@ -34,18 +27,40 @@ declare Integer[] G_PointsRepartition;
 ***LogVersion***
 ***
 MB_LogVersion(RoundsBaseScriptName, RoundsBaseVersion);
-MB_LogVersion(UI::GetScriptName(), UI::GetScriptVersion());
 ***
+
+// @mm start
+***InitServer***
+***
+declare IsRematch = False;	///< Do the players want a rematch ?
+declare RematchNb = 0;		///< Number of consecutive rematch
+***
+// @mm end
 
 ***StartServer***
 ***
+---InitMatchmaking---
+
 // ---------------------------------- //
 // Initialize mode
 UiRounds = True;
 MB_UseSectionRound = True;
-G_PointsRepartition = C_PointsRepartition;
+declare Integer[] Rounds_PointsRepartitionBackUp for This;
+// Reload XmlRpc or load default values
+if (Rounds_PointsRepartitionBackUp.count > 0) {
+	MB_PointsRepartition = Rounds_PointsRepartitionBackUp;
+} else {
+	MB_PointsRepartition = C_PointsRepartition;
+}
 
-UI::Load(["TimeGap", "SmallScoresTable", "Chrono", "CheckpointTime", "PrevBestTime"]);
+UI::LoadModules(["TimeGap", "SmallScoresTable", "Chrono", "CheckpointTime", "PrevBestTime", "SpeedAndDistance", "Countdown"]);
+UI::DisplayTimeDiff(S_DisplayTimeDiff);
+
+XmlRpc::RegisterCallback("Rounds_PointsRepartition", """
+* Data : An array of text containing the current points repartition.
+* Example : ["10", "6", "4", "3", "2", "1"]
+* Note : This callback is sent when you use the Rounds_GetPointsRepartition method
+""");
 ***
 
 ***InitMap***
@@ -57,17 +72,24 @@ MB_SetLapsNb(S_ForceLapsNb);
 ***
 // ---------------------------------- //
 // Open ladder
-Mode::Ladder_OpenMatch_All();
+MB_Ladder_OpenMatch_All();
 MB_SetLapsNb(S_ForceLapsNb);
 ***
 
+// @mm start
 ***CanSpawn***
 ***
 foreach (Score in Scores) {
 	declare CanSpawn for Score = True;
-	CanSpawn = True;
+	if (MM_IsMatchServer()) {
+		declare Player <=> TM2::GetPlayer(Score.User.Login);
+		CanSpawn = MM_PlayerIsValid(Player);
+	} else {
+		CanSpawn = True;
+	}
 }
 ***
+// @mm end
 
 ***InitRound***
 ***
@@ -103,6 +125,7 @@ foreach (Player in Players) {
 	
 	declare CanSpawn for Player.Score = True;
 	if (CanSpawn) {
+		if (UseClans) SetPlayerClan(Player, MM_GetRequestedClan(Player));
 		TM2::StartRace(Player, G_RoundStartTime);
 		CanSpawn = False;
 	} else {
@@ -111,6 +134,7 @@ foreach (Player in Players) {
 }
 ***
 
+// @mm start
 ***PlayLoopSpawnPlayers***
 ***
 // ---------------------------------- //
@@ -120,15 +144,44 @@ foreach (Player in Players) {
 	
 	declare CanSpawn for Player.Score = True;
 	if (TM2::IsWaiting(Player) && CanSpawn) {
-		TM2::StartRace(Player, G_RoundStartTime);
+		if (MM_IsMatchServer()) {
+			if (MM_PlayerIsValid(Player)) {
+				if (UseClans) SetPlayerClan(Player, MM_GetRequestedClan(Player));
+				TM2::StartRace(Player, G_RoundStartTime);
+			}
+		} else {
+			if (UseClans) SetPlayerClan(Player, MM_GetRequestedClan(Player));
+			TM2::StartRace(Player, G_RoundStartTime);
+		}
 		CanSpawn = False;
 	}
 }
 ***
+// @mm end
 
 ***Yield***
 ***
-UI::XmlRpcLoop();
+// ---------------------------------- //
+// Manage XmlRpc events
+foreach (Event in XmlRpc.PendingEvents) {
+	if (Event.ParamArray1 == "Rounds_SetPointsRepartition") {
+		declare PointsRepartition = Integer[];
+		foreach (Point in Event.ParamArray2) {
+			PointsRepartition.add(TL::ToInteger(Point));
+		}
+		if (PointsRepartition.count >= 1) {
+			MB_PointsRepartition = PointsRepartition;
+			declare Integer[] Rounds_PointsRepartitionBackUp for This;
+			Rounds_PointsRepartitionBackUp = MB_PointsRepartition;
+		}
+	} else if (Event.Param1 == "Rounds_GetPointsRepartition") {
+		declare PointsRepartition = Text[];
+		foreach (Point in MB_PointsRepartition) {
+			PointsRepartition.add(TL::ToText(Point));
+		}
+		if (XmlRpc::CallbackIsAllowed("Rounds_PointsRepartition")) XmlRpc::SendCallbackArray("Rounds_PointsRepartition", PointsRepartition);
+	}
+}
 ***
 
 ***PlayLoop***
@@ -140,19 +193,7 @@ UI::XmlRpcLoop();
 // ---------------------------------- //
 // Manage XmlRpc events
 foreach (Event in XmlRpc.PendingEvents) {
-	if (Event.ParamArray1 == "Rounds_SetPointsRepartition") {
-		declare PointsRepartition = Integer[];
-		foreach (Point in Event.ParamArray2) {
-			PointsRepartition.add(TL::ToInteger(Point));
-		}
-		if (PointsRepartition.count > 1) G_PointsRepartition = PointsRepartition;
-	} else if (Event.Param1 == "Rounds_GetPointsRepartition") {
-		declare PointsRepartition = Text[];
-		foreach (Point in G_PointsRepartition) {
-			PointsRepartition.add(TL::ToText(Point));
-		}
-		XmlRpc.SendCallbackArray("Rounds_PointsRepartition", PointsRepartition);
-	} else if (Event.Param1 == "Rounds_ForceEndRound") {
+	if (Event.Param1 == "Rounds_ForceEndRound") {
 		ForceEndRound = True;
 	}
 }
@@ -167,9 +208,47 @@ if (CutOffTimeLimit > 0 && Now >= CutOffTimeLimit) MB_StopRound = True;
 if (ForceEndRound) MB_StopRound = True;
 ***
 
+// @mm start
+***EndMap***
+***
+declare MasterLogin = "";
+declare MasterPoints = 0;
+***
+// @mm end
+
+// @mm start
+***EndMapAfterPodium***
+***
+if (MM_IsMatchServer()) {
+	if (!MM_RestartMatchmaking && TM2::GetClanNbPlayers(1) > 0 && TM2::GetClanNbPlayers(2) > 0) {
+		if (MB_StopMatch) {
+			if (RematchNb < S_MatchmakingRematchNbMax) {
+				IsRematch = MM_VoteForRematch();
+				RematchNb += 1;
+			}
+			
+			if (!IsRematch) {
+				RematchNb = 0;
+				MM_MatchEnd(MasterLogin);
+				MM_MatchToLobby();
+			} else {
+				MM_VoteForNextMap(False);
+			}
+		} else {
+			MM_VoteForNextMap(False);
+		}
+	} else {
+		RematchNb = 0;
+		MM_MatchEnd(MasterLogin);
+		MM_MatchToLobby();
+	}
+}
+***
+// @mm end
+
 ***EndServer***
 ***
-UI::Unload();
+XmlRpc::UnregisterCallback("Rounds_PointsRepartition");
 ***
 
 // ---------------------------------- //

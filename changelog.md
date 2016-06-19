@@ -1,3 +1,683 @@
+<a id="xxxx-xx-xx">xxxx-xx-xx</a>
+---------------------------------
+
+[Diff from previous release]()
+
+### Modes
+
+#### Matchmaking
+* Better save and restoration of allies when joining the lobby. [see](https://forum.maniaplanet.com/viewtopic.php?p=234752#p234752)
+
+#### Shootmania/Combo
+* The automatic spectating mode (Numpad 0) will always target a player of the team with the least spawned players. [see](https://forum.maniaplanet.com/viewtopic.php?p=238440#p238440)
+* Remember the display state of the items respawn timers and markers. [see](https://forum.maniaplanet.com/viewtopic.php?p=238440#p238440)
+* Better styling of the items respawn timers. [see](https://forum.maniaplanet.com/viewtopic.php?p=238440#p238440)
+
+#### Shootmania/Royal
+* New setting S_ResetScoreLeavers, default False. At the end of the round reset the score of any player that left the game or is in spectator mode.
+
+### Librairies
+
+#### ScoresTable2
+* Added two settings to sort the spectators and/or the disconnected players at the end of the scores table. [see](https://forum.maniaplanet.com/viewtopic.php?p=239503#p239503)
+
+#### Shootmania/WaitingQueue
+* Fix : clamp the team name to 30 characters. [see](https://forum.maniaplanet.com/viewtopic.php?p=235007#p235007)
+
+#### Shootmania/XmlRpc
+* Added the shooter and victim positions and aim directions to the LibXmlRpc_OnHit callback. [see](https://forum.maniaplanet.com/viewtopic.php?p=240641#p240641)
+
+---------------------------------
+
+
+<a id="2015-03-10">2015-03-10</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2015-02-19...ManiaPlanet_Update_2015-03-10)
+
+### Modes
+
+#### Trackmania/Chase
+* New setting S_CompetitiveMode, default value: False. In this mode only players that take a slot in a team during the warm up can play, the others will have to spec until they can get a free slot in a team. The match can be paused using a command, players are sent back into warm up and the match can restart only when both teams are ready. This mode also applies stricter rules than in matchmaking. If a team has less players than the other team, it lose the round and the match is paused until both teams have enough players. The scores can be set using a command and a round can be stopped before the end the same way. [see](https://forum.maniaplanet.com/viewtopic.php?p=241250#p241250)
+* New setting S_WaypointEventDelay, default value: 500ms. Put the waypoint events in a buffer for 500ms to avoid errors in the checkpoint order check. [see](https://forum.maniaplanet.com/viewtopic.php?p=241250#p241250)
+* New setting S_PauseBetweenRound, default value: 15s. Allow to set a pause between the rounds. [see](https://forum.maniaplanet.com/viewtopic.php?p=240242#p240242)
+* New setting S_WaitingTimeMax, default value: 600s. Allow the players who are waiting for a match to play on different maps. [see](https://forum.maniaplanet.com/viewtopic.php?p=240234#p240234)
+* New commands Command_RoundPointsClan1 and Command_RoundPointsClan2. Allow to force the scores of the teams. [see](https://forum.maniaplanet.com/viewtopic.php?p=240223#p240223)
+* New command Command_SetPause. Allow to start a pause before the next round. [see](https://forum.maniaplanet.com/viewtopic.php?p=240223#p240223)
+* New command Command_ForceEndRound. Allow to force the end of the current round. [see](https://forum.maniaplanet.com/viewtopic.php?p=240223#p240223)
+* Fix : S_MinPlayersNb can't be set to less than 2. [see](https://forum.maniaplanet.com/viewtopic.php?p=240377#p240377)
+* Fix : force the right default labels visibility.
+* Fix : the UI sometimes crashed at the end of the race because of the scoring gauges.
+
+### Librairies
+
+#### MatchmakingLobby
+* Force the rules to be displayed the first time a player joins a lobby on a mode he never played before.
+* Fix : sometime a player was selected for a match but not displayed in the versus screen because the other players didn't received info about him yet, giving the impression of a 3vs2 match by example. Now the versus screen will at least display the login of this player.
+
+#### MatchmakingMatch
+* Check only the ready status of the players and not spectators at the beginning of the matches.
+
+#### ScoresTable2
+* Added two settings to sort the spectators and/or the disconnected players at the end of the scores table. [see](https://forum.maniaplanet.com/viewtopic.php?p=239503#p239503)
+
+#### WarmUp2Common
+* Convert the WarmUp2 library from Shootmania into a common library working also for Trackmania.
+
+#### XmlRpcCommon
+* New generic methods and callbacks to control the pause system in different game modes : `LibXmlRpc_SetPause`, `LibXmlRpc_GetPause` and `LibXmlRpc_Pause`.
+* Send the map UID in the `LibXmlRpc_LoadingMap` and `LibXmlRpc_UnloadingMap` callbacks. [see](https://forum.maniaplanet.com/viewtopic.php?p=240056#p240056)
+
+#### Shootmania/XmlRpc
+* Added the shooter and victim positions and aim directions to the LibXmlRpc_OnHit callback. [see](https://forum.maniaplanet.com/viewtopic.php?p=240641#p240641)
+
+---------------------------------
+
+
+<a id="2015-02-19">2015-02-19</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2015-02-10...ManiaPlanet_Update_2015-02-19)
+
+### Modes
+
+#### Trackmania/ModeBase
+* Play the intro of the map sooner to avoid the overview of the map after the loading.
+
+#### Trackmania/ModeMatchmaking
+* Wait a bit before respawning a player while he's being transferred to its match server.
+* New setting S_MatchmakingWaitingTime to customize the waiting time duration at the beginning of the matches. Default value: 45 seconds.
+
+#### Trackmania/Chase
+* Better display of what the players must do and who can cross the next checkpoint.
+* Display the name of the players only above the cars of our team.
+* Fix : the game mode didn't give LP at the end of the match.
+* Fix : sometimes when two players were crossing a checkpoint in less than 10ms the game mode wasn't selecting the right player for the next checkpoint. [see](https://forum.maniaplanet.com/viewtopic.php?p=239549#p239549)
+* Display the duration of the relay when it's fast (less than 1000ms).
+* Better management of the 2vs3 situation. Now if three players play against a team of two players, the second player crossing a checkpoint will have to cross the next one first in both team. 
+* New settings: 
+  * S_TimeLimit default value is now 900 seconds instead of 600.
+  * S_PointsLimit renamed into S_MapPointsLimit.
+  * S_PointsGap renamed into S_RoundPointsGap
+  * New setting S_RoundPointsLimit allows to set a points limit for the round. When a team reach this points limit, it wins the round. A positive value will be the limit and 0 disable the limit. A negative value will use the number of checkpoints on the map to compute the points limit -> (-S_RoundPointsLimit * (NumberOfCheckpoints + 1)). Default value is -5.
+  * It's possible to disable the laps number limit by setting S_ForceLapsNb to 0. Default value is 10.
+  * New setting S_DisplayWarning. Display a big red message in the middle of the screen of the player that crosses a checkpoint when it wasn't its turn. Defautl value is True.
+
+### Librairies
+
+#### MatchmakingLobby
+* Display the scores table in the lobby for Trackmania.
+* Fix : Moved upwards the lobby panels in Trackmania to not hide the chat and the ranking.
+* Hide the rules from the lobby window when sliding it down. [see](https://forum.maniaplanet.com/viewtopic.php?p=239549#p239549)
+
+#### MatchmakingMatch
+* Force the players to ping back the server before considering them as ready for the match.
+* Possibility to wait for the players for a custom duration at the beginning of the match.
+
+#### Trackmania/TM2
+* Functions to reset the scores of the players without removing them from the ladder.
+
+#### Trackmania/UI
+* Use the team color of the player as background color for his card in the time gap widget. [see](https://forum.maniaplanet.com/viewtopic.php?p=239346#p239346)
+
+---------------------------------
+
+
+<a id="2015-02-10">2015-02-10</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2014-11-27...ManiaPlanet_Update_2015-02-10)
+
+### Modes
+
+#### Matchmaking
+* The matchmaking now works with Trackmania.
+
+#### Trackmania/Chase
+* New game mode.
+
+#### Trackmania/Cup
+* Matchmaking compatibility.
+
+#### Trackmania/Team
+* Matchmaking compatibility.
+
+#### Shootmania/Battle
+* Fix : don't increase the attack countdown when the disadvantaged clan capture several poles at the same time during the overtime.
+* Hide some of the settings to the players.
+* Gladiator mode : reload one armor on hit.
+
+### Librairies
+
+#### VoteMap
+* Animations on the vote map UI. [see](https://forum.maniaplanet.com/viewtopic.php?p=236199#p236199)
+
+#### Trackmania/TM2
+* New functions to get information about the clan of the players.
+* New EndRace() function with an additional argument to display or not the scores table.
+* New EndRaceAll() function to end the race of all the players at once.
+
+#### Trackmania/UI
+* Fix : hide the small scores table during the podium sequence.
+
+---------------------------------
+
+
+<a id="2014-11-27">2014-11-27</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2014-11-24...ManiaPlanet_Update_2014-11-27)
+
+### Modes
+
+#### ShootMania/Battle
+* New auto balance system at the end of the round. Check the [documentation](http://doc.maniaplanet.com/modes/shootmania/battle.html#Round-auto-balance).
+
+---------------------------------
+
+
+<a id="2014-11-24">2014-11-24</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2014-11-19...ManiaPlanet_Update_2014-11-24)
+
+### Modes
+
+#### ShootMania/ModeMatchmaking
+* Added a safe time of 15 seconds after a server transfer request that prevents players to be listed as ready if the transer is too slow. It fixes the random players suspensions and incomplete matches. [see](http://forum.maniaplanet.com/viewtopic.php?p=234284#p234284)
+* Fix : division by 0 on the average waiting time.
+
+#### ShootMania/Battle
+* Fix : better initialization of the scores and tops at the beginning of the map.
+* Fix : players can't touch a captured pole to win the overtime anymore.
+* Display the capture times of the two teams when spectating.
+
+#### ShootMania/Elite
+* Fix : double check the LadderClan of all scores at the end of the map in matchmaking.
+
+#### TrackMania/RoundsBase
+* Fix : The `Rounds_SetPointsRepartition` XmlRpc method now accepts array with only 1 item. [see](http://forum.maniaplanet.com/viewtopic.php?p=234178#p234178)
+* Restore the round points repartition after a map restart if it was changed through XmlRpc. [see](http://forum.maniaplanet.com/viewtopic.php?p=233384#p233384)
+
+### Librairies
+
+#### VoteMap
+* New style for the UI matching the Shootmania style. [see](http://forum.maniaplanet.com/viewtopic.php?p=233778#p233778)
+* Adapt the number of columns according to the number of maps in the playlist. [see](http://forum.maniaplanet.com/viewtopic.php?p=233778#p233778)
+
+#### Window
+* New library.
+* Allow to easily create resizable window background from custom images.
+
+#### TrackMania/UI
+* It's now possible to hide the endmap ladder recap and multilap info. [see](http://forum.maniaplanet.com/viewtopic.php?p=229002#p229002)
+
+---------------------------------
+
+
+<a id="2014-11-xx">2014-11-19</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2014-10-16...ManiaPlanet_Update_2014-11-19)
+
+### Modes
+
+#### ShootMania/Battle
+* Warm up system :
+  - `S_WarmUpDuration` and `S_NbPlayersPerTeamMax` are superior to 0 : classic warm up mode, with clan and slot selection.
+  - `S_WarmUpDuration` is superior to 0 : wait for `S_WarmUpDuration` seconds at the beginning of the map.
+  - `S_NbPlayersPerTeamMin` is superior to 0 : wait until there's `S_NbPlayersPerTeamMin` players in each team.
+* Display the name of the player that has captured the engagement point.
+* Display the name of the player that has captured the last pole.
+* Rework of the overtime system. You can read how this new system works in the [documentation](http://doc.maniaplanet.com/dedicated-server/battle-overtime.html).
+* Disable player collisions during 6 seconds at the beginning of the round.
+* Display different tops 5 of players at the end of the round and the map.
+* These tops 5 can be disabled with the settings `S_DisplayTopsRound` and `S_DisplayTopsMap`. It's also possible to display only the shooter top with the setting `S_DisplayTopsOnlyShooter`.
+* Display the best running time to each pole of the map.
+* It can be disabled with the setting `S_DisplayPoleRecords`.
+* Fix : display correctly up to 9 poles in the top screen UI.
+* Matchmaking fix : Don't allow a player to join a match until the matchmaking api sent the players list to the server. [see](http://forum.maniaplanet.com/viewtopic.php?p=232611#p232611)
+* Send the scores of the map to the matchmaking api.
+
+#### ShootMania/Combo
+* `S_SpawnProtectionTime` now sets the native `SpawnInvulnerabilityDuration` variable to change the spawn invulnerability duration.
+* New setting `S_RespawnAmmo` : set the amount of ammo reloaded when respawning.
+* Matchmaking fix : Don't allow a player to join a match until the matchmaking api sent the players list to the server. [see](http://forum.maniaplanet.com/viewtopic.php?p=232611#p232611)
+* Send the scores of the map to the matchmaking api.
+
+#### ShootMania/ModeMatchmaking
+* New api version : v8
+* Improvements on the progressive matchmaking. It will activate only if there's not a lot of players on the matchmaking infrastructure or if the players are waiting in the lobby for more than 90 seconds without enough players.
+* When a player leaves a match, wait 90 seconds before marking him as missing and searching a substitute.
+* Wait for the API response at the end of the match before sending player back to the lobby. This will help to fix the bug where players were sent back to the lobby at the end of the match but forced to join the match server again.
+* Display the score of the match when a player is selected to be a substitute. [see](http://forum.maniaplanet.com/viewtopic.php?f=10&t=29433#p230921)
+* Don't use the spectator status to decide if the player is ready or not in the lobby. This fix the autoready bug that occurred when there weren't any spectator slots left on the lobby. [see](http://forum.maniaplanet.com/viewtopic.php?f=10&t=29433#p230921)
+* New callbacks and methods : `Matchmaking_GetReadyState`, `Matchmaking_SetReadyState` and `Matchmaking_ReadyState` allow to manage the ready state of the players.
+* Display the names of the players voting for a rematch.
+* New setting `S_LobbyDisableUI` allows to hide the lobby UI.
+* Global variables now use a better prefix to avoid name collision.
+* Fix : players canceling a substitute won't received a penalty anymore.
+* No rematch vote if one of the team doesn't have any players left.
+* Cancel LP attribution if a match was won by forfeit after only a few rounds. [see](https://forum.maniaplanet.com/viewtopic.php?p=233551#p233551)
+* Wait for players connection/loading during 15 seconds at the beginning of each new map.
+* More debug information.
+
+#### ShootMania/ModeSport
+* Matchmaking fix : Don't allow a player to join a match until the matchmaking api sent the players list to the server. [see](http://forum.maniaplanet.com/viewtopic.php?p=232611#p232611)
+* Send the scores of the map to the matchmaking api.
+
+#### ShootMania/Elite
+* Use the new .webm video to explain the rules of the mode instead of the old .bik video. [see](http://forum.maniaplanet.com/viewtopic.php?f=10&t=29433&p=232328#p232323)
+
+#### ShootMania/Siege
+* Matchmaking fix : Don't allow a player to join a match until the matchmaking api sent the players list to the server. [see](http://forum.maniaplanet.com/viewtopic.php?p=232611#p232611)
+* Send the scores of the map to the matchmaking api.
+
+### Librairies
+
+#### XmlRpcCommon
+* Restore the blocked callbacks after a map restart. [see](http://forum.maniaplanet.com/viewtopic.php?p=232113#p232113)
+
+#### ScoresTable2
+* Restore the scores table style after a map restart. [see](http://forum.maniaplanet.com/viewtopic.php?p=232113#p232113)
+
+#### ShootMania/Elite/EliteEndSequence
+* Fix : limit the size of the player name in the UI. [see](http://forum.maniaplanet.com/viewtopic.php?f=469&t=29738)
+
+#### ShootMania/XmlRpc
+* New method and callback `LibXmlRpc_GetWarmUp` and `LibXmlRpc_WarmUp` allowing to get the current state of the warm up. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443&start=10#p232132)
+
+#### TrackMania/UI
+* Restore the UI properties after a map restart. [see](http://forum.maniaplanet.com/viewtopic.php?p=232113#p232113)
+
+---------------------------------
+
+
+<a id="2014-10-16">2014-10-16</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2014-09-10...ManiaPlanet_Update_2014-10-16)
+
+### Modes
+
+#### TrackMania/All
+* Added a description for each mode. This description is displayed when pressing esc > help while playing. [see](http://forum.maniaplanet.com/viewtopic.php?f=261&t=29199&p=230318#p230666)
+
+#### TrackMania/ModeBase
+* New callbacks : LibXmlRpc_BeginServerStop, LibXmlRpc_BeginMatchStop, LibXmlRpc_BeginMapStop, LibXmlRpc_BeginSubmatchStop, LibXmlRpc_BeginRoundStop, LibXmlRpc_BeginTurnStop, LibXmlRpc_EndTurnStop, LibXmlRpc_EndRoundStop, LibXmlRpc_EndSubmatchStop, LibXmlRpc_EndMapStop, LibXmlRpc_EndMatchStop and LibXmlRpc_EndServerStop. They are all sent at the end of their respective sequences. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+
+#### TrackMania/RoundsBase
+* Support for the new XmlRpc callbacks control system.
+
+#### ShootMania/ModeBase
+* New callbacks : LibXmlRpc_BeginServerStop, LibXmlRpc_BeginMatchStop, LibXmlRpc_BeginMapStop, LibXmlRpc_BeginSubmatchStop, LibXmlRpc_BeginRoundStop, LibXmlRpc_BeginTurnStop, LibXmlRpc_EndTurnStop, LibXmlRpc_EndRoundStop, LibXmlRpc_EndSubmatchStop, LibXmlRpc_EndMapStop, LibXmlRpc_EndMatchStop and LibXmlRpc_EndServerStop. They are all sent at the end of their respective sequences. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+
+#### ShootMania/ModeSport
+* Fixed runtime error. When using matchmaking, if the vote map was activated, some variables concerning the landmarks were initialized before the vote. So if there was a map change because of the vote, the variables were intialized with the landmarks of the previous map. [see](ttp://forum.maniaplanet.com/viewtopic.php?f=261&t=28998&view=unread#p230753)
+* Support for the new XmlRpc callbacks control system.
+* Legacy callbacks are now disable by default : S_UseLegacyCallback = False. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+* New callback "Elite_BeginTurn" containing the logins of the players. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+* New callback "Elite_EndTurn" containing the type of victory. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+
+#### ShootMania/ModeMatchmaking
+* Penalties are now managed by the matchmaking API. Thanks to that, they are now persistent and global. Persistent : if you rage quit a match and leave maniaplanet, your penalty will be applied the next time you join the lobby, even if it's one week later. Global : being penalized in one lobby means you'll be penalized in all lobbies. eg: leave a match in Elite and you will also be penalized in the Siege lobby.
+* Players are not penalized for canceling a replacement anymore.
+* Matchmaking api version : v7.
+* Removed the following settings : S_LobbyAllowMatchCancel, S_LobbyLimitMatchCancel and S_LobbyBasePenalty.
+* Removed the message warning players about matches canceling and penalties in the lobby.
+* Fix : wait for player synchro before playing a new map. [see](http://forum.maniaplanet.com/viewtopic.php?p=227013#p227013)
+* Fix : send the right player clan in the missing players array to avoid the SetPlayerClan() error in progressive matchmaking. [see](http://forum.maniaplanet.com/viewtopic.php?f=261&t=28998#p226648)
+
+#### ShootMania/Elite
+* Support for the new XmlRpc callbacks control system.
+
+#### ShootMania/Battle
+* Overtime : when the round countdown reaches zero, if one of the two team is capturing a pole the game will continue. It will end only when both teams aren't capturing a pole.
+* Display the name of the player who restarted the wave countdown if it was near 0.
+* Display tops (Attack, defense and combo) on the side of the screen when you're not playing.
+
+#### ShootMania/Combo
+* Fixed runtime error. When using matchmaking, if the vote map was activated, some variables concerning the landmarks were initialized before the vote. So if there was a map change because of the vote, the variables were intialized with the landmarks of the previous map. [see](ttp://forum.maniaplanet.com/viewtopic.php?f=261&t=28998&view=unread#p230753)
+* Support for the new XmlRpc callbacks control system.
+
+
+### Libraries
+
+#### Color
+* Fix the RgbToHsv() function. The green color wasn't converted correctly. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29453#p231086)
+
+#### Interface
+* Changed the animation of the slider from an EaseInOutBack to an EaseOutQuad easing.
+
+#### VoteMap
+* Added a text to explain how the vote works. [see](http://forum.maniaplanet.com/viewtopic.php?f=469&t=29347#p229984)
+* Removed the "validate" button. Voting for a map is now considered as validating. No need for a button anymore.  [see](http://forum.maniaplanet.com/viewtopic.php?f=469&t=29347&p=230818#p230698)
+
+#### XmlRpcCommon
+* Moved all common code between Shootmania and Trackmania in this library.
+* This library allows game modes creators to register or unregister callbacks and their documentation, making them accessible to the callback control system.
+* It's now possible to block unnecessary callbacks to save resources.
+* New method : LibXmlRpc_ListCallbacks. Trigger the LibXmlRpc_Callbacks callback listing all the registered callbacks.
+* New method : LibXmlRpc_GetCallbackHelp. Trigger the LibXmlRpc_CallbackHelp callback giving help about a callback.
+* New method : LibXmlRpc_BlockCallback. Block a specific callback.
+* New method : LibXmlRpc_BlockAllCallbacks. Block all callbacks.
+* New method : LibXmlRpc_UnblockCallback. Unblock a specific callback.
+* New method : LibXmlRpc_UnblockAllCallbacks. Unblock all callbacks.
+* New method : LibXmlRpc_GetBlockedCallbacks. Trigger the LibXmlRpc_BlockedCallbacks callback listing the blocked callbacks.
+* New callbacks : LibXmlRpc_BeginServer and LibXmlRpc_EndServer. They are sent when the script start and stop. Which can happen at server start, stop or map restart.
+* New callbacks : LibXmlRpc_BeginServerStop, LibXmlRpc_BeginMatchStop, LibXmlRpc_BeginMapStop, LibXmlRpc_BeginSubmatchStop, LibXmlRpc_BeginRoundStop, LibXmlRpc_BeginTurnStop, LibXmlRpc_EndTurnStop, LibXmlRpc_EndRoundStop, LibXmlRpc_EndSubmatchStop, LibXmlRpc_EndMapStop, LibXmlRpc_EndMatchStop and LibXmlRpc_EndServerStop. They are all sent at the end of their respective sequences. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+
+#### TrackMania/UI
+* New controls on the Trackmania UI via XmlRpc. It's now possible to control (hide/show/move) most of the UI elements of Trackmania with XmlRpc. [see](http://forum.maniaplanet.com/viewtopic.php?f=470&t=28654&start=0) & [documentation](http://doc.maniaplanet.com/creation/maniascript/libraries/library-ui.html)
+* Better alignment of the sand timer. [see](http://forum.maniaplanet.com/viewtopic.php?f=470&t=28654&start=10#p229872)
+* Support for the new XmlRpc callbacks control system.
+
+#### TrackMania/XmlRpc
+* Use the new XmlRpcCommon library.
+* Support for the new XmlRpc callbacks control system.
+
+#### ShootMania/AFK
+* Support for the new XmlRpc callbacks control system.
+
+#### ShootMania/Stats
+* Support for the new XmlRpc callbacks control system.
+
+#### ShootMania/XmlRpc
+* Use the new XmlRpcCommon library.
+* Support for the new XmlRpc callbacks control system.
+* Addition of the hit distance in the "LibXmlRpc_OnHit" callback. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+* New callback "Elite_BeginTurn" containing the logins of the players. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+* New callback "Elite_EndTurn" containing the type of victory. [see](http://forum.maniaplanet.com/viewtopic.php?f=279&t=29443#p231006)
+
+---------------------------------
+
+
+<a id="2014-09-10">2014-09-10</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2014-07-24...ManiaPlanet_Update_2014-09-10)
+
+### Modes
+
+#### ShootMania/All modes
+* Fix : Reset the rules in the spawn screen at the beginning of each map to avoid to fill the rules array with duplicate rules.
+
+#### ShootMania/Battle
+* Fix : Check that a player Id exists in the Players array before trying to access it. [see](http://forum.maniaplanet.com/viewtopic.php?p=227017#p227017)
+* Fix : The "Attack" and "Defend" messages at the top of screen are now displayed correctly when spawning. [see](http://forum.maniaplanet.com/viewtopic.php?f=8&t=28620&p=224480#p224370)
+* In spectator mode, when using the cam7 (global view) the name of the team in attack is displayed. eg : "Blue is attacking".
+
+#### Shootmania/ModeMatchmaking
+* Fix : Check that User is not Null before using it. [see](http://forum.maniaplanet.com/viewtopic.php?p=226307#p226307)
+* Fix : substitutes were kicked by the match server when joining under certain conditions.
+
+#### ShootMania/Siege
+* The weapons used in atk and def during the previous round are saved even across maps.
+* Fix the "LibXmlRpc_Scores" callback in Siege.
+
+#### TrackMania/RoundsBase
+* Fix the Rounds_GetPointsRepartition and Rounds_SetPointsRepartition XmlRpc callback and method. They could be invoked only during the round, now it's possible to invoke them anytime. [see](http://forum.maniaplanet.com/viewtopic.php?p=227330#p227330)
+
+
+### Libraries
+
+#### ShootMania/Debug
+* New quad styles and substyles.
+
+#### ShootMania/VoteMap
+* Fix : set the correct library name in the ScriptName #Const
+
+#### ShootMania/XmlRpc
+* The "LibXmlRpc_BeginMatch" callback now return one more value. A boolean to indicate if the script was restarted or not.
+
+#### TrackMania/XmlRpc
+* The "LibXmlRpc_BeginMatch" callback now return one more value. A boolean to indicate if the script was restarted or not.
+
+---------------------------------
+
+
+<a id="2014-07-24">2014-07-24</a>
+---------------------------------
+
+[Diff from previous release](https://github.com/maniaplanet/game-modes/compare/ManiaPlanet_Update_2014-07-11...Maniaplanet_Update_2014-07-24)
+
+### Modes
+
+#### Shootmania/Battle
+* Matchmaking enhancements : vote map, rematch and progressive matchmaking.
+* The setting "S_NbPlayersPerTeam" is replaced by "S_NbPlayersPerTeamMax".
+* New setting "S_NbPlayersPerTeamMin".
+* "S_NbPlayersPerTeamMin" and "S_NbPlayersPerTeamMax" allow to setup the minimum and maximum number of players in a team in matchmaking.
+
+#### Shootmania/Combo
+* Matchmaking enhancements : vote map, rematch and progressive matchmaking.
+* Setting "S_NbPlayersPerTeam" is replaced by "S_NbPlayersPerTeamMax".
+* New setting "S_NbPlayersPerTeamMin".
+* "S_NbPlayersPerTeamMin" and "S_NbPlayersPerTeamMax" controls the maximum and minimum number of players a clan must have in matchmaking.
+
+#### Shootmania/Elite
+* Setting "S_GameplayVersion" is removed. Elite now uses the same gameplay version that the other game modes.
+* Matchmaking enhancement : progressive matchmaking.
+* Display the matchmaking match id in the top left corner of the screen of the scores table.
+* Setting "S_RequiredPlayersNb" replaced by "S_NbPlayersPerTeamMax", default value is 3.
+* New setting "S_NbPlayersPerTeamMin", default value is 2.
+* "S_NbPlayersPerTeamMax" and "S_NbPlayersPerTeamMin"  allow to setup the maximum and minimum number of players per team in matchmaking.
+
+#### Shootmania/Heroes
+* Rename the "S_RequiredPlayersNb" setting into "S_NbPlayersPerTeamMax" to match the one in the Elite script.
+
+#### Shootmania/ModeMatchmaking
+* New rematch feature. At the end of a match the players can vote to play another one with the same people. If enough players agree a new match starts on the same server without going through the lobby again.
+* New vote map feature. At the start of the match and at the end of each map the players can vote for the next map. Each player can vote for one map, all the maps that receive a vote are placed in a pool. If a map have several votes, it will be placed the same number of time in the pool. Then one map is chosen randomly in the pool to be the next one.
+* New progressive matchmaking. When there's not enough players on the lobby, the matchmaking can start a match with less players and then send substitute to complete the match line up. Eg: 5vs5 Siege need 10 players on the lobby. With progressive matchmaking, the lobby can start a match with only 4 players. Then this match will receive substitutes from the lobby until there's 10 players.
+* The matchmaking function is now ran much more frequently, every 10 seconds instead of 40 seconds.
+* The players connection maximum waiting time when joining the match server is reduced to 20 seconds (it was 60 seconds before the update).
+* The animation of the gauge in the lobby is smoother.
+* New version of the matchmaking api. The S_MatchmakingAPIUrl setting value is now "https://matchmaking.maniaplanet.com/v6".
+* New setting S_MatchmakingRematchRatio, set the minimum ratio of players that have to agree to play a rematch before launching one. The value range from 0.0 to 1.0. Any negative value turn off the rematch vote. The default value is -1.0.
+* New setting S_MatchmakingRematchNbMax, set the maximum number of consecutive rematch. The default value is 2.
+* New setting S_MatchmakingVoteForMap, allow or not to vote for the next map. The default value is False.
+* New setting S_MatchmakingProgressive, enable or disable the progressive matchmaking. The default value is False.
+* Setting S_LobbyTimePerRound is removed and replaced by the S_LobbyMatchmakerTime and S_LobbyMatchmakerWait settings.
+* Setting S_LobbyMatchmakerTime set the duration of the versus screen display. The default value is 8 (it was 10 before the update).
+* Setting S_LobbyMatchmakerWait set the waiting time before calling the matchmaking function again. The default value is 2. So in the end the matchamking runs every (S_LobbyMatchmakerTime + S_LobbyMatchmakerWait) seconds -> 10 seconds by default.
+* New setting S_LobbyMatchmakerPerRound, set how many times the matchmaking function is called before ending the current round of King of the Lobby. The default value is 6.
+
+#### Shootmania/ModeSport
+* Matchmaking enhancement : rematch and vote map.
+* The duration of the podium sequence at the end of the match is not shorten by the S_QuickMode setting anymore.
+* Setting "S_RequiredPlayersNb" renamed into "S_NbPlayersPerTeamMax" to match the change in the Elite script.
+
+#### Shootmania/Siege
+* Fix : when using the old capture mode, capture time won't be divided by the number of gates at the checkpoint.
+
+#### Trackmania/TeamAttack
+* Fix : use the correct ScriptName constant. Now "TeamAttack.Script.txt" instead of "TimeAttack.Script.txt". [see](http://forum.maniaplanet.com/viewtopic.php?p=221874#p221874)
+
+#### Trackmania/TimeAttack
+* Fix : the time attack mode now sends the "LibXmlRpc_BeginWarmUp" call back at the beginning of the warm up and "LibXmlRpc_EndWarmUp" at the end. Additionally it also sends all events callbacks during the warm up (eg: "LibXmlRpc_OnStartLine", "OnWayPoint", etc). [see](http://forum.maniaplanet.com/viewtopic.php?p=221954#p221954)
+
+
+### Librairies
+
+#### Interface
+* Add a name to the manialink that will be displayed in the debugger.
+
+#### VoteMap
+* New library allowing to vote for the next map. The library displays a list of all the maps available on the server. Each player can vote for one map. Several players can vote for the same map. When the vote timer reach 0. Each map with at least one vote is put into a pool. If a map has several votes, it's put several times into the pool. The library will then select a random map inside the pool and set it as the next map.
+
+#### Shootmania/Elite/EliteEndSequence
+* Fix : the gauge don't increase continuously until map change under certain conditions anymore.
+* Rewrite of the script animating the gauge. Added an easing and a sound on the animation.
+
+---------------------------------
+
+
+<a id="2014-07-11">2014-07-11</a>
+---------------------------------
+
+[Commit on GitHub](https://github.com/maniaplanet/game-modes/commit/8ccbd77b5a1a49edc59a586700be538eb8bb93bb)
+
+### Modes
+
+#### ShootMania/ModeMatchmaking
+* New setting "S_LobbyBasePenalty" allowing to set a custom penalty time base. Default is now 120 instead of 90 seconds. [see](http://forum.maniaplanet.com/viewtopic.php?p=221663#p221663)
+
+
+### Librairies
+
+#### TrackMania/UI
+* Fix : don't display anymore the small scores table on the right of the screen while racing in warm up mode after finishing the map a first time.
+
+#### TrackMania/XmlRpc
+* Add the total score (PlayerScore.Points + PlayerScore.PrevRaceDeltaPoints) to the LibXmlRpc_PlayerRanking callback. [see](http://forum.maniaplanet.com/viewtopic.php?p=219271#p219271)
+
+#### ShootMania/Elite/EndSequence
+* Fix : there's now an animation when loosing LP. [see](http://forum.maniaplanet.com/viewtopic.php?p=221732#p221732)
+* Fix : echelon from 9.2 to 9.9 are correctly displayed. [see](http://forum.maniaplanet.com/viewtopic.php?p=221732#p221732)
+* Fix : the amount of LP lost is correctly displayed.
+* Fix : always display two decimals for the LP amount.
+
+---------------------------------
+
+
+<a id="2014-07-10">2014-07-10</a>
+---------------------------------
+
+[Commit on GitHub](https://github.com/maniaplanet/game-modes/commit/579c412356dfc26a257fe9b63198e721aaad2fde)
+
+### Modes
+
+#### ShootMania/Siege
+* New setting S_AtkNbIncreaseCaptureSpeed. Select if the number of attackers on the gate increase the capture speed. It's now turned off by default.
+* Fix : If a spectator was on the server at the beginning of the turn he could later join the ongoing round with 1 armor point. It's not the case anymore.
+* Fix : Weapon was saved only at the end of the round and loaded after each respawn. Now weapon is saved as soon as the player change it.
+
+#### ShootMania/Battle
+* Fix : When spectating a player the "Attack/Defend" message at the top of the screen was relative to the spectator clan and not the spectated player clan. [see](http://forum.maniaplanet.com/viewtopic.php?p=221397#p221397)
+
+---------------------------------
+
+
+<a id="2014-07-09">2014-07-09</a>
+---------------------------------
+
+[Commit on GitHub](https://github.com/maniaplanet/game-modes/commit/8557231d00b773092c13dc7fe628c6af0af4e874)
+
+### Modes
+
+#### ModeBase
+* All "synchronous" functions from the Mode library now have "asynchronous" equivalents in ModeBase. It allows to avoid calling a yield; in the library at the risk of missing important events (eg: XmlRpc events).
+
+#### ShootMania/Battle
+* The mode is now compatible with the matchmaking system, you can open your own lobby and match servers.
+
+#### ShootMania/ModeMatchmaking
+* It's now possible to show/hide on the client side the waiting screen, players list and masters list.
+* Players kicked from a match won't be sent back to the match server when they rejoin the lobby. [see](http://forum.maniaplanet.com/viewtopic.php?p=219695#p219695)
+* Three new XmlRpc methods to control the matchmaking function in the lobby : Matchmaking_Start, Matchmaking_Stop and Matchmaking_Force. With these it's now possible to stop/restart the matchmaking cleanly when needed (eg: before a restart/force next map).
+* Fix : going to the next map after a vote won't restart the 60 seconds waiting time at the beginning of the map. [see](http://forum.maniaplanet.com/viewtopic.php?p=220073#p220073)
+* Fix : going to the next map after a vote while the match was already started won't kick the players from the server anymore. [see](http://forum.maniaplanet.com/viewtopic.php?p=219976#p219976)
+* Fix : a player that go from ready to unready state between the API request and response wasn't sent to its match and the match wasn't canceled. Now this player will be penalized and the match canceled properly. [see](http://forum.maniaplanet.com/viewtopic.php?p=221311#p221311)
+
+#### ShootMania/Siege
+* Each checkpoint can now be associated with one, two or three gates instead of being forced at two.
+* There is 45 seconds to capture all the checkpoint's gates. A bonus of 10 seconds is awarded when capturing a gate.
+* The capture time of the gates is equal to 4.5 seconds divided by the number of gates at the checkpoints. eg: 3 gates -> 1.5 seconds each, 2 gates -> 2.25 seconds each, 1 gate -> 4.5 second.
+* Only 2 ammo instead of 4 for the Rocket in attack. [see](http://forum.maniaplanet.com/viewtopic.php?p=219700#p219700)
+* Play a sound only on attacker elimination instead of a different sound for defender and attacker elimination. [see](http://forum.maniaplanet.com/viewtopic.php?p=219700#p219700)
+* New setting S_WeaponMode. It can take one of these values : 0 -> Rocket versus Laser, 1 -> select your weapon before the turn, 2 -> switch weapon during the turn. Default value is 2.
+* New setting S_GatesStopDefenders. Select if players can walk through gates or not. Default value is True, so defenders can't go through gates anymore. [see](http://forum.maniaplanet.com/viewtopic.php?p=219700#p219700)
+* It's now possible to move/hide some parts of the UI by pressing F8. It's also possible to hide/show the gates/spawn markers this way. [see](http://forum.maniaplanet.com/viewtopic.php?p=219700#p219700)
+* The small scores header at the top of the screen now displays the number of players remaining in each team instead of the number of checkpoints captured.
+
+
+### Librairies
+
+#### Mode
+* All "synchronous" functions from this library now have "asynchronous" equivalents in ModeBase. It allows to avoid calling a yield; in the library at the risk of missing important events (eg: XmlRpc events).
+
+#### Top2
+* Fix : the library failed to access some users while updating. We now check that the user will be available before trying to access it.
+
+
+### MapTypes
+
+#### ShootMania/SiegeV2Arena
+* Each checkpoint can now be associated with one, two or three gates instead of being forced at two.
+
+---------------------------------
+
+
+<a id="2014-07-02">2014-07-02</a>
+---------------------------------
+
+[Commit on GitHub](https://github.com/maniaplanet/game-modes/commit/0284efbe53c8202f79c113143f30fb40cbfedd13)
+
+### Modes
+
+#### ShootMania/Elite
+* Initialize the dodge total from the scores table in ***InitMap*** instead of ***StartMap*** to avoid to keep the value from the previous match while waiting for the match to start in matchmaking. [see](http://forum.maniaplanet.com/viewtopic.php?p=218684#p218684)
+* Use the new GetMode() function to get the current mode (free or classic) instead of accessing directly to the S_Mode setting. This function will always return a "valid" value (0 or 1) so the assert() are not necessary anymore. [see](https://github.com/maniaplanet/game-modes/issues/4)
+
+#### ShootMania/ModeBase
+* New boolean allowing to cancel an ongoing matchmaking match and start a new one.
+
+#### ShootMania/ModeMatchmaking
+* Universal lobby mode. Disable the matchmaking function on the lobby and allow players to create their own match. The lobby will then send players to a free match server.
+* Fix on the "remind rules" frame of the lobby to correctly display long texts inside. [see](http://forum.maniaplanet.com/viewtopic.php?p=218668#p218668)
+* Fix a bug displaying players as allies in the versus screen of the lobby even if they were not.
+
+#### ShootMania/ModeSport
+* Fix : don't restart a matchmaking match when voting for change/next map on first map. Just keep playing the same match with the same players.
+
+#### TrackMania/ModeBase
+* Replaced all calls to the Mode library "sync" functions by the same call to the new "async" function from ModeBase. It solves XmlRpc problems where call to the TriggerModeScriptEvent and TriggerModeScriptEventArray methods were ignored if they were sent a few milliseconds after map beginning/ending (during ladder communication with the master server especially).
+
+#### TrackMania/Rounds
+* Replace the custom RoundsVersion and RoundsScriptName #Const by the default Version and ScriptName. [see](http://forum.maniaplanet.com/viewtopic.php?f=489&t=27822)
+
+#### TrackMania/RoundsBase
+* New setting S_DisplayTimeDiff to hide/show time difference at checkpoint. [see](http://forum.maniaplanet.com/viewtopic.php?f=8&t=27872&p=218204#p218204)
+
+
+### Libraries
+
+#### Interface
+* Fix a bug preventing to remove a slide from the slider module. [see](http://forum.maniaplanet.com/viewtopic.php?f=468&t=27899#p217310)
+
+#### ShootMania/Debug
+* New styles added to the "styles" manialink (see BgsButtons in the background category)
+
+#### ShootMania/Elite/EliteEndSequence
+* Fix: added the missing </script> node at the end of the manialink xml. That was preventing the whole UI to work as expected at the end of the map.
+
+#### ShootMania/Elite/EliteStats
+* New tracking and saving system for attack ratio.
+
+#### ShootMania/WeaponSelection2
+* Fix on the weapon selection screen. Sometimes pressing the 1, 2, 3 or 4 key didn't selected the right weapon.
+
+#### TrackMania/TM2
+* Send the "LibXmlRpc_OnStartCountDown" callback when calling the StartRace() function.
+* Force the UI sequence of the player to None when spawning him on the track.
+
+#### TrackMania/UI
+* The default checkpoint crossing sound is not played anymore when the default chrono UI is hidden. So the lib now plays the sound instead.
+
+#### TrackMania/XmlRpc
+* New XmlRpc callback "LibXmlRpc_OnStartCountDown" sent when the player is spawned on the track before the 3,2,1,GO!. [see](http://forum.maniaplanet.com/viewtopic.php?f=261&t=27956&start=20#p219270)
+* The "LibXmlRpc_OnRespawn" callback sends more info : player login, block id, checkpoint in race, checkpoint in lap, number of respawn. [see](http://forum.maniaplanet.com/viewtopic.php?f=261&t=27956&start=20#p219270)
+* Add the total score (PlayerScore.Points + PlayerScore.PrevRaceDeltaPoints) to the LibXmlRpc_PlayerRanking callback. [see](http://forum.maniaplanet.com/viewtopic.php?f=261&t=27956&start=10#p218240)
+* More details in the LibXmlRpc_PlayersRanking callback : the login, rank, best checkpoints, team id, spectator status, away status, best time, zone, points and total points of the players are separated by a colon
+
+
+### Documentation
+* New styles added to the "styles" manialink (see BgsButtons in the background category)
+
+---------------------------------
+
+
 <a id="2014-05-22">2014-05-22</a>
 ---------------------------------
 
@@ -65,7 +745,6 @@
 
 #### ShootMania/EliteStats
 * New stat system : save the probability that the attacker can win the round based on his number of armors, the number of defenders and the time left in the round.
-
 
 ---------------------------------
 
